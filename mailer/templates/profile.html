@@ -1,0 +1,26 @@
+{% extends 'base.html' %}
+{% block content %}
+<div class="container">
+{%  if form.errors %}
+    {{ form.errors }}
+    {%  endif  %}
+    <h2>Добавить подписчика</h2>
+    <form method="post">
+        {% csrf_token %}
+        {{ form.as_p }}
+        <button type="submit" class="btn btn-primary">Сохранить</button>
+    </form>
+</div>
+    <div class="row justify-content-center">
+        {% for subscriber in subscribers %}
+            <div class="card m-4" style="width: 18rem;">
+              <div class="card-body">
+                <h5 class="card-title"> {{ subscriber.first_name }} {{ subscriber.last_name }} </h5>
+                <p class="card-text"> {{ subscriber.email }}</p>
+                <a href="/delete/{{ subscriber.id }}" class="btn btn-danger">Удалить</a>
+              </div>
+            </div>
+
+        {% endfor %}
+    </div>
+{% endblock %}

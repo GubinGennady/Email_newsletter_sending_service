@@ -1,0 +1,217 @@
+{% load static %}
+
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>{% block title %}{% endblock %}</title>
+    <!-- Подключение Bootstrap CSS -->
+    <link rel="stylesheet" href={% static "css/bootstrap.css" %}>
+    <style>
+        .modal-tab {
+            cursor: pointer;
+        }
+
+        .modal-tab.active {
+            font-weight: bold;
+            border-bottom: 2px solid #0d6efd;
+        }
+    </style>
+    <style>
+        .hero-section {
+            background: url('https://via.placeholder.com/1500x800') no-repeat center center/cover;
+            color: white;
+            padding: 100px 0;
+            text-align: center;
+        }
+
+        .features-section {
+            padding: 60px 0;
+        }
+
+        .feature-icon {
+            font-size: 3rem;
+            color: #0d6efd;
+        }
+
+        .cta-section {
+            background: #f8f9fa;
+            padding: 60px 0;
+            text-align: center;
+        }
+
+        .footer {
+            background: #343a40;
+            color: white;
+            padding: 20px 0;
+            text-align: center;
+        }
+    </style>
+</head>
+<body>
+
+<!-- Навигация -->
+<nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+    <div class="container">
+        <a class="navbar-brand" href="#">EmailSender</a>
+        <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav"
+                aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+            <span class="navbar-toggler-icon"></span>
+        </button>
+        <div class="collapse navbar-collapse" id="navbarNav">
+            <ul class="navbar-nav ms-auto">
+                <li class="nav-item">
+                    <a class="nav-link active" aria-current="page" href="#">Главная</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">О нас</a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link" href="#">Тарифы</a>
+                </li>
+             {% if user.is_authenticated %}
+                <li class="nav-item">
+                    <a class="nav-link" href="/mailings">Рассылки</a>
+                </li>
+                 <li class="nav-item">
+                    <a class="nav-link" href="/profile">Профиль</a>
+                </li>
+                      <li class="nav-item">
+                    <a class="nav-link" href="/logout">Выход</a>
+                </li>
+                {% else %}
+                <li class="nav-item">
+                    <a class="nav-link" data-bs-toggle="modal" data-bs-target="#authModal" href="#">Войти /
+                        Зарегистрироваться</a>
+                </li>
+
+                {% endif %}
+
+
+            </ul>
+        </div>
+    </div>
+</nav>
+
+{% block content %}
+{% endblock %}
+
+<!-- Футер -->
+<footer class="footer">
+    <div class="container">
+        <p>&copy; 2023 EmailSender. Все права защищены.</p>
+    </div>
+</footer>
+<!-- Модальное окно -->
+<div class="modal fade" id="authModal" tabindex="-1" aria-labelledby="authModalLabel" aria-hidden="true">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <ul class="nav nav-tabs border-0">
+                    <li class="nav-item">
+                        <a class="nav-link modal-tab active" data-bs-toggle="tab" href="#loginTab">Вход</a>
+                    </li>
+                    <li class="nav-item">
+                        <a class="nav-link modal-tab" data-bs-toggle="tab" href="#registerTab">Регистрация</a>
+                    </li>
+                </ul>
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body">
+                <div class="tab-content">
+                    <!-- Вкладка входа -->
+                    <div class="tab-pane fade show active" id="loginTab">
+                        <form>
+                            <div class="mb-3">
+                                <label for="loginEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="loginEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="loginPassword" class="form-label">Пароль</label>
+                                <input type="password" class="form-control" id="loginPassword" required>
+                            </div>
+                            <button type="submit" class="btn btn-primary w-100">Войти</button>
+                        </form>
+                    </div>
+                    <!-- Вкладка регистрации -->
+                    <div class="tab-pane fade" id="registerTab">
+                        <div id="responseMessage">
+
+                        </div>
+                            <div class="mb-3">
+                                <label for="registerName" class="form-label">Имя</label>
+                                <input type="text" class="form-control" id="registerName" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerEmail" class="form-label">Email</label>
+                                <input type="email" class="form-control" id="registerEmail" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerPassword" class="form-label">Пароль</label>
+                                <input type="password" class="form-control" id="registerPassword" required>
+                            </div>
+                            <div class="mb-3">
+                                <label for="registerConfirmPassword" class="form-label">Подтвердите пароль</label>
+                                <input type="password" class="form-control" id="registerConfirmPassword" required>
+                            </div>
+                            <button type="submit" id="btn_reg" class="btn btn-success w-100">Зарегистрироваться</button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Подключение Bootstrap JS -->
+<script src={% static "js/bootstrap.bundle.min.js" %}></script>
+<script src={% static "js/jquery.js" %}></script>
+<script>
+    // Добавляем активный стиль для вкладок
+    const tabs = document.querySelectorAll('.modal-tab');
+    tabs.forEach(tab => {
+        tab.addEventListener('click', () => {
+            tabs.forEach(t => t.classList.remove('active'));
+            tab.classList.add('active');
+        });
+    });
+</script>
+<script>
+    $(document).ready(function () {
+        // Обработка отправки формы
+        $('#btn_reg').on('click', function () {
+
+            // Проверка совпадения паролей
+            if ($('#registerPassword').val() !== $('#registerConfirmPassword').val()) {
+                $('#responseMessage').html('<div class="alert alert-danger">Пароли не совпадают!</div>');
+            }else{
+                 // Сбор данных формы
+                $.ajax({
+                    url: '/register/', // Укажите URL вашего серверного скрипта
+                    type: 'POST',
+                    data: {'name':$('#registerName').val(),'email': $('#registerEmail').val(), 'password': $('#registerPassword').val()},
+                    success: function (response) {
+                        // Обработка успешного ответа
+                        $('#responseMessage').html('<div class="alert alert-success">Вы успешно зарегистрированы. Через 2 секунды будуте перенаправлены в профиль</div>');
+                        //$('#registerForm')[0].reset(); // Очистка формы
+                        setTimeout(function(){
+                            window.location.href = '/profile';
+                        }, 2000);
+                    },
+                    error: function (xhr) {
+                        // Обработка ошибки
+                        const errorMessage = xhr.responseJSON ? xhr.responseJSON.message : 'Ошибка при регистрации';
+                        $('#responseMessage').html('<div class="alert alert-danger">' + errorMessage + '</div>');
+                    }
+                });
+            }
+
+
+
+            // Отправка AJAX-запроса
+
+        });
+    });
+</script>
+</body>
+</html>
