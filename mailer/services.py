@@ -87,6 +87,7 @@ from .models import Mailings, EmailLog
 from datetime import datetime, timedelta
 from django.utils import timezone
 from .models import Mailings
+import datetime
 
 
 def send_email(mailing):
@@ -141,9 +142,11 @@ def cronjob():
     Проверяет рассылки, которые нужно отправить, и вызывает send_email.
     """
     # Текущее время с учетом часового пояса
+    timezone.activate('Europe/Moscow')
     cur_time = timezone.now()
+    cur_time += timedelta(hours=3)
 
-    # Получаем активные рассылки, которые нужно отправить
+
     mailings = Mailings.objects.filter(
         is_sent=False,  # Рассылка еще не отправлена
         send_date__lte=cur_time,  # Время отправки наступило

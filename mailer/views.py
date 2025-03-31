@@ -1,4 +1,5 @@
 from django.contrib.auth.decorators import login_required
+from django.core.mail import send_mail
 from django.http import JsonResponse
 from django.shortcuts import render, redirect
 from django.utils.decorators import method_decorator
@@ -16,7 +17,7 @@ class Index(TemplateView):
     template_name = 'index.html'
 
 
-    # def get_context_data(self, **kwargs):
+
     #     context_data = super().get_context_data(**kwargs)
     #     context_data['object_list'] = HomeClient.objects.all()[:0]
     #     return context_data)

@@ -11,6 +11,7 @@ https://docs.djangoproject.com/en/5.1/ref/settings/
 """
 import os
 from pathlib import Path
+from celery.schedules import crontab
 from dotenv import load_dotenv
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -38,8 +39,11 @@ INSTALLED_APPS = [
     'django.contrib.sessions',
     'django.contrib.messages',
     'django.contrib.staticfiles',
-    'django_cron',
+    #'django_cron',
+    'django_celery_beat',
+    'django_celery_results',
     'mailer.apps.MailerConfig',
+
 ]
 
 MIDDLEWARE = [
@@ -50,6 +54,8 @@ MIDDLEWARE = [
     'django.contrib.auth.middleware.AuthenticationMiddleware',
     'django.contrib.messages.middleware.MessageMiddleware',
     'django.middleware.clickjacking.XFrameOptionsMiddleware',
+    'django.middleware.common.CommonMiddleware',
+
 ]
 
 ROOT_URLCONF = 'mailing.urls'
@@ -135,14 +141,62 @@ AUTH_USER_MODEL = 'mailer.CustomUser'
 # settings email
 
 EMAIL_BACKEND = 'django.core.mail.backends.smtp.EmailBackend'
-EMAIL_HOST = 'smtp.gmail.com'
-EMAIL_PORT = 587
-EMAIL_USE_TLS = False
-EMAIL_USE_SSL = True
+EMAIL_HOST = 'smtp.mail.ru'
+EMAIL_PORT = 465  # Порт для SSL
+#EMAIL_USE_TLS = True
+EMAIL_USE_SSL = True  # Использовать SSL
+EMAIL_HOST_USER = 'shishkina0302@list.ru'  # Ваш адрес электронной почты на Mail.ru
+EMAIL_HOST_PASSWORD = 'n9mctKkvjDFXHRgVTUiU'  # Пароль от вашей почты
+DEFAULT_FROM_EMAIL = 'shishkina0302@list.ru'
 
-EMAIL_HOST_USER = os.getenv("EMAIL_HOST_USER")
-EMAIL_HOST_PASSWORD = os.getenv("EMAIL_HOST_PASSWORD")
 
-CRON_CLASSES = [
-    "mailer.cron.MyCronJob",
-]
+
+# CRON_CLASSES = [
+#     "mailer.cron.MyCronJob",
+# ]
+
+# CRONJOB = [
+#     ('* * * * *', 'mailer.services.cronjob'),
+# ]
+
+# URL-адрес брокера сообщений
+#CELERY_BROKER_URL = 'redis://127.0.0.1:6379/'
+
+# URL-адрес брокера результатов, также Redis
+#CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/'
+
+# Настройки для Celery
+# CELERY_BEAT_SCHEDULE = {
+#     'check_habits_daily': {
+#         'task': 'mailer.tasks.check_mailing_and_send_reminders',
+#         'schedule': crontab(minute=2, hour=0),  # каждый день в 8 утра
+#     },
+# }
+
+
+CELERY_BROKER_URL = 'redis://127.0.0.1:6379/0'
+CELERY_RESULT_BACKEND = 'redis://127.0.0.1:6379/1'
+CELERY_ACCEPT_CONTENT = ['json']
+CELERY_TASK_SERIALIZER = 'json'
+CELERY_RESULT_SERIALIZER = 'json'
+
+
+CELERY_TIMEZONE = 'Europe/Moscow'
+
+# # django setting.
+# CACHES = {
+#     'default': {
+#         'BACKEND': 'django.core.cache.backends.db.DatabaseCache',
+#         'LOCATION': 'my_cache_table',
+#     }
+# }
+
+# Настройки Celery Beat
+CELERY_BEAT_SCHEDULE = {
+    'check_mailing_every_5_seconds': {
+        'task': 'mailer.tasks.check_mailing_and_send_reminders',
+        'schedule': 5.0,  # Каждые 5 секунд
+        # Альтернативно можно использовать:
+        # 'schedule': datetime.timedelta(seconds=5),
+    },
+}
